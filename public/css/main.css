@@ -263,17 +263,27 @@ details summary{
 }
 
 
-.header-card {
+.header-card{
   background: url("/img/voces.jpeg") no-repeat center center;
   background-size: cover;
-  aspect-ratio: 16/7;
+  min-height: 320px;
   border: none !important;
+  position: relative;
 }
 
-@media (max-width: 768px) {
-  .header-card {
-    aspect-ratio: 16/9;
-    background-position: center top;
+@media (max-width: 768px){
+  .header-card{
+    min-height: 200px;              /* menos alto */
+    background-position: 50% 20%;   /* sube el enfoque (ajústalo: 10%–35%) */
+    background-size: 130%;          /* “zoom” controlado (110%–160%) */
+  }
+}
+
+@media (max-width: 420px){
+  .header-card{
+    min-height: 170px;
+    background-position: 50% 15%;
+    background-size: 145%;
   }
 }
 
