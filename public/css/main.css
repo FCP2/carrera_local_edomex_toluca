@@ -275,7 +275,7 @@ details summary{
   .header-card{
     min-height: 200px;              /* menos alto */
     background-position: 50% 20%;   /* sube el enfoque (ajústalo: 10%–35%) */
-    background-size: 130%;          /* “zoom” controlado (110%–160%) */
+    background-size: 90%;          /* “zoom” controlado (110%–160%) */
   }
 }
 
@@ -283,7 +283,7 @@ details summary{
   .header-card{
     min-height: 170px;
     background-position: 50% 15%;
-    background-size: 145%;
+    background-size: 100%;
   }
 }
 
