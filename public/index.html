@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Registro Carrera 8M – 5K</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Flatpickr CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body class="bg-light">
+  <div class="container py-5" style="max-width: 900px;">
+        <!-- Header mejorado -->
+    <div class="card header-card shadow-lg mb-3 overflow-hidden">
+      <div class="card-body p-0"></div>
+    </div>
+
+    <div class="event-strip shadow-sm mb-4">
+      <div class="d-flex flex-wrap gap-2">
+        <span class="chip chip-dark"><i class="bi bi-patch-check-fill me-1"></i>Registro oficial</span>
+      </div>
+
+      <a class="btn btn-hero" href="#frm">
+        <i class="bi bi-pencil-square me-2"></i>Registrar
+      </a>
+    </div>
+
+    <div id="alertBox" class="alert d-none shadow-sm border-0" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      <span id="alertText"></span>
+    </div>
+
+    <!-- Formulario principal -->
+    <form id="frm" class="card shadow-lg border-0 bg-gold-light">
+      <div class="card-body p-4 p-md-5">
+        
+        <!-- Sección I: Datos Generales -->
+        <h5 class="form-section mb-4">
+          <i class="bi bi-person-badge-fill me-2"></i>I. Datos generales
+        </h5>
+        <div class="row g-3">
+          <div class="col-md-8">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-person-fill me-1 text-muted"></i>Nombre completo
+            </label>
+            <input class="form-control form-control-lg" name="nombre_completo" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-card-text me-1 text-muted"></i>CURP (opcional)
+            </label>
+            <input class="form-control form-control-lg" name="curp" maxlength="18">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-calendar3 me-1 text-muted"></i>Fecha de nacimiento
+            </label>
+            <input 
+              type="text"
+              id="fechaNacimiento"
+              class="form-control form-control-lg"
+              name="fecha_nacimiento"
+              placeholder="dd/mm/aaaa"
+            required>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-hash me-1 text-muted"></i>Edad
+            </label>
+            <input type="number" min="18" max="80" class="form-control form-control-lg" name="edad" required readonly>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-geo-alt-fill me-1 text-muted"></i>Municipio
+            </label>
+            <select class="form-select form-select-lg" name="id_municipio" id="municipioSelect" required>
+              <option value="">Selecciona municipio...</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-telephone-fill me-1 text-muted"></i>Teléfono
+            </label>
+            <input class="form-control form-control-lg" name="telefono" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-envelope-fill me-1 text-muted"></i>Correo
+            </label>
+            <input type="email" class="form-control form-control-lg" name="email" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-droplet-half me-1 text-muted"></i>Tipo de sangre (opcional)
+            </label>
+            <input class="form-control form-control-lg" name="tipo_sangre" placeholder="O+, A-, etc.">
+          </div>
+         <!-- <div class="col-md-3">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-tshirt me-1 text-muted"></i>Talla playera
+            </label>
+            <select class="form-select form-control-lg" name="talla_playera" required>
+              <option value="">Selecciona…</option>
+              <option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option>
+            </select>
+          </div> -->
+
+          <hr class="my-4">
+
+          <h5 class="form-section mb-4">
+            <i class="bi bi-trophy-fill me-2 text-warning"></i>II. Premiación (solo servidoras públicas)
+          </h5>
+
+          <div class="row g-3">
+            <div class="col-md-6 form-check form-switch form-check-lg">
+              <input class="form-check-input" type="checkbox" name="es_servidora_publica" id="es_servidora_publica">
+              <label class="form-check-label fs-6 fw-semibold" for="es_servidora_publica">
+                Participaré para premiación (soy servidora pública)
+              </label>
+            </div>
+
+            <div class="col-md-6 form-check form-switch form-check-lg">
+              <input class="form-check-input" type="checkbox" name="num_empleado_no_aplica" id="num_empleado_no_aplica" checked>
+              <label class="form-check-label fs-6" for="num_empleado_no_aplica">
+                No aplica (correré recreativamente)
+              </label>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">
+                <i class="bi bi-badge-ad me-1 text-muted"></i>Número de empleado
+              </label>
+              <input class="form-control form-control-lg" name="num_empleado" id="num_empleado" disabled placeholder="Captura tu número de empleado">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">
+                <i class="bi bi-building me-1 text-muted"></i>Dependencia / Secretaría
+              </label>
+              <input class="form-control form-control-lg" name="dependencia" id="dependencia" disabled
+                    placeholder="Ej. Secretaría General de Gobierno">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">
+                <i class="bi bi-diagram-3 me-1 text-muted"></i>Área
+              </label>
+              <input class="form-control form-control-lg" name="area" id="area" disabled
+                    placeholder="Ej. Dirección / Departamento / Coordinación">
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- Sección II: Emergencia -->
+        <h5 class="form-section mb-4">
+          <i class="bi bi-exclamation-diamond-fill me-2 text-danger"></i>III. Emergencia
+        </h5>
+        <div class="row g-3">
+          <div class="col-md-8">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-person-plus-fill me-1 text-danger"></i>Contacto de emergencia
+            </label>
+            <input class="form-control form-control-lg" name="contacto_emergencia_nombre" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-telephone-x-fill me-1 text-danger"></i>Teléfono emergencia
+            </label>
+            <input class="form-control form-control-lg" name="contacto_emergencia_tel" required>
+          </div>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- Sección III: Salud -->
+        <h5 class="form-section mb-4">
+          <i class="bi bi-heart-fill me-2 text-warning"></i>IV. Salud
+        </h5>
+        <div class="row g-3">
+          <div class="col-md-6 form-check form-switch form-check-lg">
+            <input class="form-check-input salud" type="checkbox" name="enf_cronica" id="enf_cronica">
+            <label class="form-check-label fs-6" for="enf_cronica">
+              <i class="bi bi-thermometer-half me-2"></i>Enfermedad crónica
+            </label>
+          </div>
+          <div class="col-md-6 form-check form-switch form-check-lg">
+            <input class="form-check-input salud" type="checkbox" name="prob_cardiacos" id="prob_cardiacos">
+            <label class="form-check-label fs-6" for="prob_cardiacos">
+              <i class="bi bi-heart-pulse me-2"></i>Problemas cardíacos
+            </label>
+          </div>
+          <div class="col-md-6 form-check form-switch form-check-lg">
+            <input class="form-check-input salud" type="checkbox" name="prob_respiratorios" id="prob_respiratorios">
+            <label class="form-check-label fs-6" for="prob_respiratorios">
+              <i class="bi bi-lungs-fill me-2"></i>Condición respiratoria
+            </label>
+          </div>
+          <div class="col-md-6 form-check form-switch form-check-lg">
+            <input class="form-check-input salud" type="checkbox" name="tratamiento_actual" id="tratamiento_actual">
+            <label class="form-check-label fs-6" for="tratamiento_actual">
+              <i class="bi bi-capsule me-2"></i>Tratamiento médico
+            </label>
+          </div>
+          <div class="col-md-6 form-check form-switch form-check-lg">
+            <input class="form-check-input salud" type="checkbox" name="alergias_meds" id="alergias_meds">
+            <label class="form-check-label fs-6" for="alergias_meds">
+              <i class="bi bi-exclamation-triangle me-2 text-warning"></i>Alergias a medicamentos
+            </label>
+          </div>
+          <div class="col-12 d-none" id="boxDetalle">
+            <label class="form-label mt-3 fw-semibold">Detalle (obligatorio si marcaste alguna)</label>
+            <textarea class="form-control form-control-lg" name="salud_detalle" rows="3"></textarea>
+          </div>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- Sección IV: Participación -->
+        <h5 class="form-section mb-4">
+          <i class="bi bi-check2-circle me-2 text-success"></i>V. Participación
+        </h5>
+        <div class="row g-3">
+          <div class="col-md-4 form-check form-switch form-check-lg">
+            <input class="form-check-input" type="checkbox" name="participo_antes" id="participo_antes">
+            <label class="form-check-label fs-6" for="participo_antes">
+              <i class="bi bi-award me-2"></i>He participado antes en otras carreras
+            </label>
+          </div>
+          <!--<div class="col-md-4 form-check form-switch form-check-lg">
+            <input class="form-check-input" type="checkbox" name="constancia_digital" id="constancia_digital">
+            <label class="form-check-label fs-6" for="constancia_digital">
+              <i class="bi bi-file-earmark-pdf me-2"></i>Quiero constancia digital
+            </label>
+          </div>-->
+        </div>
+
+        <hr class="my-4">
+
+        <!-- Documentos legales -->
+        <details class="mb-3 border rounded p-3 bg-white shadow-sm">
+          <summary class="text-primary fw-semibold h6 mb-2 cursor-pointer">
+            <i class="bi bi-file-earmark-text me-2"></i>Ver carta responsiva
+          </summary>
+          <div class="small text-muted mt-2 ps-4">
+            Declaro que me encuentro en condiciones físicas adecuadas para participar. Reconozco los riesgos inherentes a la actividad deportiva y deslindo de cualquier tipo de responsabilidad a las autoridades organizadoras. Autorizo el uso de mi imagen con fines institucionales del evento.
+          </div>
+        </details>
+
+        <details class="mb-4 border rounded p-3 bg-white shadow-sm">
+          <summary class="text-primary fw-semibold h6 mb-2 cursor-pointer">
+            <i class="bi bi-shield-lock me-2"></i>Ver aviso de privacidad
+          </summary>
+          <div class="small text-muted mt-2 ps-4">
+            Los datos serán usados exclusivamente para registro, logística y seguridad del evento.
+          </div>
+        </details>
+
+        <!-- Aceptaciones -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-6 form-check form-switch form-check-lg">
+            <input class="form-check-input" type="checkbox" name="acepta_responsiva" id="acepta_responsiva" required>
+            <label class="form-check-label fs-6 text-danger fw-semibold" for="acepta_responsiva">
+              <i class="bi bi-check-circle-fill me-2"></i>Acepto carta responsiva
+            </label>
+          </div>
+          <div class="col-md-6 form-check form-switch form-check-lg">
+            <input class="form-check-input" type="checkbox" name="acepta_privacidad" id="acepta_privacidad" required>
+            <label class="form-check-label fs-6 text-primary fw-semibold" for="acepta_privacidad">
+              <i class="bi bi-check-circle-fill me-2"></i>Acepto aviso de privacidad
+            </label>
+          </div>
+        </div>
+
+        <!-- Captcha -->
+        <div class="my-3 d-flex justify-content-center">
+          <div class="cf-turnstile"
+              data-sitekey="0x4AAAAAACg8zHIw_zSbQvzr"
+              data-theme="light">
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="d-flex justify-content-between flex-wrap gap-3">
+          <button class="btn btn-outline-secondary btn-lg px-4" type="reset">
+            <i class="bi bi-arrow-clockwise me-2"></i>Limpiar
+          </button>
+          <button class="btn btn-primary btn-lg px-5" type="submit">
+            <i class="bi bi-check-lg me-2"></i>Registrar
+          </button>
+        </div>
+
+      </div>
+    </form>
+
+    <!-- Confirmación 8M MORADA -->
+    <div class="card shadow-lg mt-5 border-0 rounded-4 mx-auto d-none" id="okBox" style="max-width: 520px;">
+        <div class="card-body text-center p-5 position-relative" 
+            style="background: linear-gradient(135deg, #9B1073 0%, #9B1073 100%); color: white; min-height: 450px;">
+            
+            <!-- Icono morado -->
+            <div class="mb-4">
+                <div class="bg-white bg-opacity-20 rounded-circle d-inline-flex align-items-center justify-content-center mb-3 p-4" 
+                    style="backdrop-filter: blur(10px);">
+                    <i class="bi bi-check-circle-fill display-3" style="color: white; text-shadow: 0 4px 12px rgba(0,0,0,0.3);"></i>
+                </div>
+            </div>
+            
+            <h1 class="mb-4 fw-bold display-5 lh-sm" style="color: white;">¡Registro Exitoso!</h1>
+            
+            <div class="mb-4 fs-4 fw-semibold" style="color: rgba(255,255,255,0.9);">Tu folio:</div>
+            <div class="h2 fw-bolder mb-5 py-4 px-5 rounded-4 mx-auto" 
+                id="lblFolio" 
+                style="background: rgba(255,255,255,0.25); color: white; letter-spacing: 3px; max-width: 350px; backdrop-filter: blur(10px); border: 2px solid rgba(255,255,255,0.4);">
+                #ABC123
+            </div>
+            
+            <div class="mb-4 fs-4 fw-semibold" style="color: rgba(255,255,255,0.9);">Número de corredora:</div>
+            <div class="h3 fw-bold mb-4" id="lblNumeroCorredora" style="color: white; text-shadow: 0 2px 8px rgba(0,0,0,0.3);">COR-04567</div>
+            
+            <div class="fs-5" style="color: rgba(255,255,255,0.85);">
+                <i class="bi bi-printer-fill me-2" style="color: rgba(255,255,255,0.9);"></i>
+                <strong>Guarda este folio</strong> para recoger tu kit
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script src="./app.js"></script>
+  <!-- Flatpickr JS -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+</body>
+</html>
