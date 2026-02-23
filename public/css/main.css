@@ -263,11 +263,18 @@ details summary{
 }
 
 
-.header-card{
-  background: url("/img/voces.jpeg") no-repeat center/cover !important;
-  min-height: 340px;
+.header-card {
+  background: url("/img/voces.jpeg") no-repeat center center;
+  background-size: cover;
+  aspect-ratio: 16/7;
   border: none !important;
-  position: relative;
+}
+
+@media (max-width: 768px) {
+  .header-card {
+    aspect-ratio: 16/9;
+    background-position: center top;
+  }
 }
 
 /* Sin overlay encima para no tapar logos */
