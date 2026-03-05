@@ -9,6 +9,53 @@ const lblNumeroCorredora =document.getElementById("lblNumeroCorredora");
 const saludChecks = Array.from(document.querySelectorAll(".salud"));
 const boxDetalle = document.getElementById("boxDetalle");
 
+//foraneo
+const chkForanea = document.getElementById("chkForanea");
+const selMun = document.getElementById("municipioSelect");
+
+const boxE = document.getElementById("boxForaneaEstado");
+const boxC = document.getElementById("boxForaneaCiudad");
+const inpEstado = document.getElementById("inpEstado");
+const inpCiudad = document.getElementById("inpCiudad");
+
+function syncForaneaUI(){
+  const foranea = !!chkForanea.checked;
+
+  if (foranea) {
+    // municipio ya no aplica
+    selMun.required = false;
+    selMun.value = "";
+    selMun.disabled = true;
+
+    // mostrar campos foráneos
+    boxE.classList.remove("d-none");
+    boxC.classList.remove("d-none");
+    inpEstado.disabled = false;
+    inpCiudad.disabled = false;
+    inpEstado.required = true;
+    inpCiudad.required = true;
+  } else {
+    // municipio obligatorio
+    selMun.disabled = false;
+    selMun.required = true;
+
+    // ocultar foráneos
+    inpEstado.required = false;
+    inpCiudad.required = false;
+    inpEstado.value = "";
+    inpCiudad.value = "";
+    inpEstado.disabled = true;
+    inpCiudad.disabled = true;
+    boxE.classList.add("d-none");
+    boxC.classList.add("d-none");
+  }
+}
+
+chkForanea?.addEventListener("change", syncForaneaUI);
+syncForaneaUI();
+
+//foraneo fin
+
 function showAlert(type, msg) {
   alertBox.className = `alert alert-${type}`;
   alertBox.textContent = msg;
@@ -48,7 +95,7 @@ function formToPayload(form) {
 
   const bools = [
     "enf_cronica","prob_cardiacos","prob_respiratorios","tratamiento_actual","alergias_meds",
-    "participo_antes","constancia_digital","acepta_responsiva","acepta_privacidad","es_servidora_publica","num_empleado_no_aplica"
+    "participo_antes","constancia_digital","acepta_responsiva","acepta_privacidad"
   ];
   bools.forEach(k => payload[k] = fd.get(k) === "on");
   payload.edad = Number(payload.edad);
@@ -65,8 +112,8 @@ frm.addEventListener("submit", async (e) => {
   okBox.classList.add("d-none");
 
   const payload = formToPayload(frm);
-    payload.turnstile_token =
-      (document.querySelector('[name="cf-turnstile-response"]')?.value || "").trim();
+  payload.turnstile_token =
+    (document.querySelector('[name="cf-turnstile-response"]')?.value || "").trim();
 
   console.log("token len:", payload.turnstile_token.length);
 
@@ -83,14 +130,27 @@ frm.addEventListener("submit", async (e) => {
       return;
     }
 
+    // UI éxito
     lblFolio.textContent = data.folio;
     lblNumeroCorredora.textContent = data.numero_corredora;
     okBox.classList.remove("d-none");
+
+    // PDF carta (mejor después de éxito)
+    const url = `/api/carta?folio=${encodeURIComponent(data.folio)}`;
+
+    const btn = document.getElementById("btnCarta");
+    if (btn) btn.href = url;
+
+    // Intentar abrir (en móvil puede bloquearse; el botón siempre queda)
+    window.open(url, "_blank");
+
     frm.reset();
     saludOn();
     await loadStatus();
     window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-  } catch {
+
+  } catch (err) {
+    console.error(err);
     showAlert("danger", "Error de conexión.");
   }
 });
@@ -112,50 +172,24 @@ async function loadMunicipios() {
     console.error('Error cargando municipios:', err);
   }
 }
+//cargar tipo de playeras:
 
-const swServidora = document.getElementById("es_servidora_publica");
-const swNoAplica = document.getElementById("num_empleado_no_aplica");
-const inpEmpleado = document.getElementById("num_empleado");
-const inpDependencia = document.getElementById("dependencia");
-const inpArea = document.getElementById("area");
+async function loadTallas() {
+  const r = await fetch("/api/playeras");
+  const data = await r.json();
 
-function syncEmpleadoUI(){
-  const esServ = !!swServidora?.checked;
+  const sel = document.getElementById("tallaSelect");
 
-  if (esServ) {
-    swNoAplica.checked = false;
-
-    inpEmpleado.disabled = false;
-    inpEmpleado.required = true;
-
-    inpDependencia.disabled = false;
-    inpDependencia.required = true;
-
-    inpArea.disabled = false;
-    inpArea.required = true;
-
-  } else {
-    inpEmpleado.required = false;
-    inpDependencia.required = false;
-    inpArea.required = false;
-
-    const noAplica = !!swNoAplica?.checked;
-
-    inpEmpleado.disabled = noAplica;
-    inpDependencia.disabled = noAplica;
-    inpArea.disabled = noAplica;
-
-    if (noAplica) {
-      inpEmpleado.value = "";
-      inpDependencia.value = "";
-      inpArea.value = "";
-    }
-  }
+  data.tallas.forEach(t => {
+    const opt = document.createElement("option");
+    opt.value = t.talla;
+    opt.textContent = `${t.talla} (${t.stock_disponible} disponibles)`;
+    sel.appendChild(opt);
+  });
 }
 
-swServidora?.addEventListener("change", syncEmpleadoUI);
-swNoAplica?.addEventListener("change", syncEmpleadoUI);
-syncEmpleadoUI();
+document.addEventListener("DOMContentLoaded", loadTallas);
+
 
 // Llamar al cargar DOM
 document.addEventListener('DOMContentLoaded', loadMunicipios);
