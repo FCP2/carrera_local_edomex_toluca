@@ -7,7 +7,7 @@ const app = express();
 app.use(express.json({ limit: "1mb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
-const CUPO_MAX = Number(process.env.CUPO_MAX || 1000);
+const CUPO_MAX = Number(process.env.CUPO_MAX || 1500);
 const FOLIO_PREFIX = process.env.FOLIO_PREFIX || "8M-2026-";
 
 
@@ -360,7 +360,7 @@ app.get("/api/carta", async (req, res) => {
     drawBadge(page2, { x, y, w, h, text: `FOLIO: ${row.folio}`, font, size: 14 });
     y -= (h + gap);
 
-    drawBadge(page2, { x, y, w, h, text: `NO. CORREDORA: ${row.numero_corredora}`, font, size: 14 });
+    drawBadge(page2, { x, y, w, h, text: `NO. DE REGISTRO: ${row.numero_corredora}`, font, size: 14 });
     y -= (h + gap);
 
     // Nombre puede ser largo: si es muy largo, baja size
