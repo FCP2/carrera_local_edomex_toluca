@@ -455,3 +455,51 @@ hr { opacity: .12; }
   }
 }
 
+.ati-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, rgba(109,40,217,.08) 0%, rgba(139,92,246,.06) 100%);
+  border: 1px solid rgba(109,40,217,.15);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  font-size: .85rem;
+  color: var(--ink);
+  margin: 2rem auto 1rem;
+  max-width: max-content;
+  box-shadow: var(--shadow-soft);
+  transition: all .3s ease;
+}
+
+.ati-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+  background: linear-gradient(135deg, rgba(109,40,217,.12) 0%, rgba(139,92,246,.10) 100%);
+}
+
+.ati-signature {
+  font-weight: 700;
+  color: var(--brand);
+}
+
+.ati-handle {
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-family: 'ui-monospace', monospace;
+  letter-spacing: -.5px;
+}
+
+/* Móvil */
+@media (max-width: 576px) {
+  .ati-badge {
+    flex-direction: column;
+    text-align: center;
+    padding: 14px 16px;
+    gap: 4px;
+  }
+}
+
