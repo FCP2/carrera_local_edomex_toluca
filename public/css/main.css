@@ -263,27 +263,17 @@ details summary{
 }
 
 
-.header-card{
+.header-card {
   background: url("/img/voces.jpeg") no-repeat center center;
   background-size: cover;
-  min-height: 320px;
+  aspect-ratio: 16/7;
   border: none !important;
-  position: relative;
 }
 
-@media (max-width: 768px){
-  .header-card{
-    min-height: 200px;              /* menos alto */
-    background-position: 50% 20%;   /* sube el enfoque (ajústalo: 10%–35%) */
-    background-size: 90%;          /* “zoom” controlado (110%–160%) */
-  }
-}
-
-@media (max-width: 420px){
-  .header-card{
-    min-height: 170px;
-    background-position: 50% 15%;
-    background-size: 100%;
+@media (max-width: 768px) {
+  .header-card {
+    aspect-ratio: 16/9;
+    background-position: center top;
   }
 }
 
@@ -338,4 +328,13 @@ details summary{
 @keyframes slideInUp {
     from { transform: translateY(30px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
+}
+/*css baner registro*/
+.chip-danger {
+  background: linear-gradient(135deg, #e91e63, #f06292);
+  color: white;
+  font-weight: 600;
+}
+.btn-danger.text-white:hover {
+  background: #c2185b !important;
 }
