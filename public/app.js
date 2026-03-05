@@ -196,22 +196,35 @@ document.addEventListener('DOMContentLoaded', loadMunicipios);
 document.addEventListener("DOMContentLoaded", function () {
 
   const fp = flatpickr("#fechaNacimiento", {
-    dateFormat: "d/m/Y",      // lo que ve el usuario
+    dateFormat: "d/m/Y",
     altInput: false,
     allowInput: true,
-    maxDate: "today",         // no fechas futuras
+    maxDate: "today",
     locale: {
       firstDayOfWeek: 1
     },
-    onChange: function(selectedDates, dateStr) {
+
+    onChange: function(selectedDates) {
       if (selectedDates.length > 0) {
+
         const edad = calcularEdad(selectedDates[0]);
         document.querySelector('[name="edad"]').value = edad;
 
+        const chkMenor = document.getElementById("chkMenor");
+
         if (edad < 18) {
-          showAlert("warning", "Solo mayores de edad (18+).");
+          // activar modo menor automáticamente
+          if (chkMenor) chkMenor.checked = true;
+
+          showAlert("warning", "Participación de menores requiere registro de padre/madre/tutor.");
         } else {
+          if (chkMenor) chkMenor.checked = false;
           hideAlert();
+        }
+
+        // refresca UI del bloque tutor
+        if (typeof syncMenorUI === "function") {
+          syncMenorUI();
         }
       }
     }
@@ -231,6 +244,36 @@ function calcularEdad(fecha) {
 
   return edad;
 }
+
+//switch menores de edad cargar:
+const chkMenor = document.getElementById("chkMenor");
+const boxTutorNombre = document.getElementById("boxTutorNombre");
+const boxTutorTel = document.getElementById("boxTutorTel");
+const boxTutorNota = document.getElementById("boxTutorNota");
+const inpTutorNombre = document.getElementById("tutor_nombre");
+const inpTutorTel = document.getElementById("tutor_telefono");
+
+function syncMenorUI(){
+  const isMenor = !!chkMenor?.checked;
+
+  [boxTutorNombre, boxTutorTel, boxTutorNota].forEach(el => el?.classList.toggle("d-none", !isMenor));
+
+  if (inpTutorNombre && inpTutorTel) {
+    inpTutorNombre.disabled = !isMenor;
+    inpTutorTel.disabled = !isMenor;
+
+    inpTutorNombre.required = isMenor;
+    inpTutorTel.required = isMenor;
+
+    if (!isMenor) {
+      inpTutorNombre.value = "";
+      inpTutorTel.value = "";
+    }
+  }
+}
+
+chkMenor?.addEventListener("change", syncMenorUI);
+syncMenorUI();
 
 loadStatus();
 saludOn();
