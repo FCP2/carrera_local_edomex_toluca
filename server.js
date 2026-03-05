@@ -69,6 +69,8 @@ app.post("/api/registros", async (req, res) => {
   const edad = Number(b.edad);
 
   const email = String(b.email || "").trim();
+  const emailNorm = email.toLowerCase(); // ✅ normalizado una vez
+
   const telefono = cleanPhone(b.telefono);
 
   const contacto_emergencia_nombre = String(b.contacto_emergencia_nombre || "").trim();
@@ -104,8 +106,25 @@ app.post("/api/registros", async (req, res) => {
 
   if (!nombre_completo || nombre_completo.length < 5) return res.status(400).json({ ok:false, msg:"Nombre inválido." });
   if (!fecha_nacimiento) return res.status(400).json({ ok:false, msg:"Fecha nacimiento requerida." });
-  if (!Number.isFinite(edad) || edad < 18) return res.status(400).json({ ok:false, msg:"Solo mayores de edad (18+)." });
-  if (!isEmail(email)) return res.status(400).json({ ok:false, msg:"Email inválido." });
+  if (!Number.isFinite(edad) || edad < 1 || edad > 100) {
+    return res.status(400).json({ ok:false, msg:"Edad inválida." });
+  }
+
+  const es_menor = !!b.es_menor || edad < 18;
+
+  const tutor_nombre = String(b.tutor_nombre || "").trim();
+  const tutor_telefono = cleanPhone(b.tutor_telefono);
+
+  if (edad < 18) {
+    if (!tutor_nombre || tutor_nombre.length < 5) {
+      return res.status(400).json({ ok:false, msg:"Captura el nombre del padre/madre/tutor." });
+    }
+    if (!tutor_telefono || tutor_telefono.length < 10) {
+      return res.status(400).json({ ok:false, msg:"Captura un teléfono válido del tutor." });
+    }
+  }
+
+  if (!isEmail(emailNorm)) return res.status(400).json({ ok:false, msg:"Email inválido." });
   if (!telefono || telefono.length < 10) return res.status(400).json({ ok:false, msg:"Teléfono inválido." });
   if (!contacto_emergencia_nombre || !contacto_emergencia_tel || contacto_emergencia_tel.length < 10)
     return res.status(400).json({ ok:false, msg:"Contacto de emergencia incompleto." });
@@ -131,12 +150,21 @@ app.post("/api/registros", async (req, res) => {
     return res.status(403).json({ ok:false, msg:"Captcha inválido. Intenta de nuevo." });
   }
 
-  // talla (solo si aún hay stock; si no selecciona, queda null)
   const talla_playera = (String(b.talla_playera || "").trim().toUpperCase() || null);
 
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
+
+    // ✅ 1) pre-check duplicado ANTES de nextval (evita brinco en pruebas)
+    const dupEmail = await client.query(
+      `SELECT 1 FROM registros_8m_5k WHERE lower(email) = $1 LIMIT 1`,
+      [emailNorm]
+    );
+    if (dupEmail.rows.length) {
+      await client.query("ROLLBACK");
+      return res.status(409).json({ ok:false, msg:"Este correo ya está registrado." });
+    }
 
     // cupo
     const cupo = await client.query("SELECT COUNT(*)::int AS total FROM registros_8m_5k");
@@ -145,28 +173,7 @@ app.post("/api/registros", async (req, res) => {
       return res.status(409).json({ ok:false, msg:"Cupo lleno. Registro cerrado." });
     }
 
-
-    // Playera: descontar inventario solo si eligió talla
-    if (talla_playera) {
-      const check = await client.query(
-        `SELECT stock_disponible FROM playeras_stock WHERE talla = $1 FOR UPDATE`,
-        [talla_playera]
-      );
-
-      if (!check.rows.length || Number(check.rows[0].stock_disponible) <= 0) {
-        await client.query("ROLLBACK");
-        return res.status(400).json({ ok:false, msg:"La talla seleccionada ya se agotó." });
-      }
-
-      await client.query(
-        `UPDATE playeras_stock
-         SET stock_disponible = stock_disponible - 1
-         WHERE talla = $1`,
-        [talla_playera]
-      );
-    }
-
-    // folio / corredora
+    // ✅ 2) SOLO si todo está OK, ahora sí pedir secuencias
     const seq = await client.query("SELECT nextval('seq_folio_8m_2026') AS n");
     const folio = `${FOLIO_PREFIX}${String(seq.rows[0].n).padStart(4, "0")}`;
 
@@ -177,6 +184,7 @@ app.post("/api/registros", async (req, res) => {
       INSERT INTO registros_8m_5k (
         folio, numero_corredora,
         nombre_completo, fecha_nacimiento, edad,
+        es_menor, tutor_nombre, tutor_telefono,
         curp, id_municipio, es_foranea, estado, ciudad,
         telefono, email,
         contacto_emergencia_nombre, contacto_emergencia_tel,
@@ -188,44 +196,48 @@ app.post("/api/registros", async (req, res) => {
       ) VALUES (
         $1,$2,
         $3,$4,$5,
-        $6,$7,$8,$9,$10,
-        $11,$12,
-        $13,$14,
-        $15,$16,
-        $17,$18,$19,$20,$21,$22,
-        $23,$24,
-        $25,$26,
-        $27,$28
+        $6,$7,$8,
+        $9,$10,$11,$12,$13,
+        $14,$15,
+        $16,$17,
+        $18,$19,
+        $20,$21,$22,$23,$24,$25,
+        $26,$27,
+        $28,$29,
+        $30,$31
       )
       RETURNING folio, numero_corredora, created_at
     `;
 
     const params = [
-      folio, numero_corredora,                              // $1..$2
-      nombre_completo, fecha_nacimiento, edad,              // $3..$5
-      b.curp ? String(b.curp).trim() : null,                // $6
-      id_municipio,                                         // $7  (puede ser null si es foránea)
-      es_foranea,                                           // $8
-      estado,                                               // $9  (null si no es foránea)
-      ciudad,                                               // $10 (null si no es foránea)
-      telefono,                                             // $11
-      email.toLowerCase(),                                  // $12
-      contacto_emergencia_nombre,                           // $13
-      contacto_emergencia_tel,                              // $14
-      b.tipo_sangre ? String(b.tipo_sangre).trim().toUpperCase() : null, // $15
-      talla_playera,                                        // $16
-      !!b.enf_cronica,                                      // $17
-      !!b.prob_cardiacos,                                   // $18
-      !!b.prob_respiratorios,                               // $19
-      !!b.tratamiento_actual,                               // $20
-      !!b.alergias_meds,                                    // $21
-      (salud_detalle || null),                              // $22
-      !!b.participo_antes,                                  // $23
-      !!b.constancia_digital,                               // $24
-      acepta_responsiva,                                    // $25
-      acepta_privacidad,                                    // $26
-      (ip || null),                                         // $27
-      genero                                                // $28
+      folio, numero_corredora,
+      nombre_completo, fecha_nacimiento, edad,
+      es_menor,
+      tutor_nombre || null,
+      tutor_telefono || null,
+      b.curp ? String(b.curp).trim() : null,
+      id_municipio,
+      es_foranea,
+      estado,
+      ciudad,
+      telefono,
+      emailNorm,
+      contacto_emergencia_nombre,
+      contacto_emergencia_tel,
+      b.tipo_sangre ? String(b.tipo_sangre).trim().toUpperCase() : null,
+      talla_playera,
+      !!b.enf_cronica,
+      !!b.prob_cardiacos,
+      !!b.prob_respiratorios,
+      !!b.tratamiento_actual,
+      !!b.alergias_meds,
+      (salud_detalle || null),
+      !!b.participo_antes,
+      !!b.constancia_digital,
+      acepta_responsiva,
+      acepta_privacidad,
+      (ip || null),
+      genero
     ];
 
     const ins = await client.query(q, params);
@@ -240,11 +252,14 @@ app.post("/api/registros", async (req, res) => {
 
   } catch (err) {
     await client.query("ROLLBACK");
+
+    // (se mantiene tu manejo por constraint para el caso de concurrencia real)
     if (String(err?.code) === "23505") {
       const c = err?.constraint || "";
       if (c === "uq_registros8m_email") return res.status(409).json({ ok:false, msg:"Este correo ya está registrado." });
       return res.status(409).json({ ok:false, msg:"Registro duplicado (dato único ya existe)." });
     }
+
     console.error(err);
     res.status(500).json({ ok:false, msg:"Error interno." });
   } finally {
@@ -269,8 +284,27 @@ app.get("/api/playeras", async (req, res) => {
   res.json({ ok:true, tallas:r.rows });
 });
 //pdf carta
+
 const fs = require("fs");
 const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
+
+function drawBadge(page, { x, y, w, h, text, font, size = 12 }) {
+  page.drawRectangle({
+    x, y, width: w, height: h,
+    color: rgb(0.91, 0.24, 0.53),       // rosa
+    borderColor: rgb(0.75, 0.12, 0.39), // borde rosa fuerte
+    borderWidth: 1,
+    borderRadius: 10                   // si falla, quítalo (ver nota)
+  });
+
+  page.drawText(text, {
+    x: x + 14,
+    y: y + (h - size) / 2 - 1,
+    size,
+    font,
+    color: rgb(1, 1, 1)
+  });
+}
 
 app.get("/api/carta", async (req, res) => {
   try {
@@ -293,26 +327,55 @@ app.get("/api/carta", async (req, res) => {
     const pdfDoc = await PDFDocument.load(existingPdfBytes);
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-    const page = pdfDoc.getPages()[0];
+    const pages = pdfDoc.getPages();
+    if (pages.length < 2) {
+      return res.status(500).send("El PDF base no tiene 2 páginas.");
+    }
 
-    // 👇 Ajusta posiciones (x,y) según tu PDF real
-    page.drawText(`Folio: ${row.folio}`, {
-      x: 50, y: 120, size: 11, font, color: rgb(0,0,0)
-    });
-    page.drawText(`No. Corredora: ${row.numero_corredora}`, {
-      x: 50, y: 105, size: 11, font, color: rgb(0,0,0)
-    });
-    page.drawText(`Nombre: ${row.nombre_completo}`, {
-      x: 50, y: 90, size: 11, font, color: rgb(0,0,0)
+    const page2 = pages[1]; // ✅ SOLO hoja 2
+
+    // Formato fecha/hora CDMX
+    const fecha = new Date(row.created_at).toLocaleString("es-MX", {
+      timeZone: "America/Mexico_City",
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit"
     });
 
-    page.drawText(`Talla de Playera: ${row.talla_playera}`, {
-      x: 50, y: 75, size: 11, font, color: rgb(0,0,0)
+    // ✅ Layout vertical (ajusta y si quieres más arriba/abajo)
+    const x = 60;
+    let y = 420;     // << mueve este para subir/bajar el bloque
+    const w = 480;
+    const h = 34;
+    const gap = 10;
+
+    // Título arriba (opcional)
+    page2.drawText("DATOS DE REGISTRO", {
+      x,
+      y: y + 60,
+      size: 14,
+      font,
+      color: rgb(0.55, 0.05, 0.25)
     });
+
+    drawBadge(page2, { x, y, w, h, text: `FOLIO: ${row.folio}`, font, size: 14 });
+    y -= (h + gap);
+
+    drawBadge(page2, { x, y, w, h, text: `NO. CORREDORA: ${row.numero_corredora}`, font, size: 14 });
+    y -= (h + gap);
+
+    // Nombre puede ser largo: si es muy largo, baja size
+    const nombre = String(row.nombre_completo || "").trim();
+    const nombreSize = nombre.length > 35 ? 10 : 12;
+    drawBadge(page2, { x, y, w, h, text: `NOMBRE: ${nombre}`, font, size: nombreSize });
+    y -= (h + gap);
+
+    drawBadge(page2, { x, y, w, h, text: `TALLA (estadística): ${row.talla_playera || "N/A"}`, font, size: 12 });
+    y -= (h + gap);
+
 
     const out = await pdfDoc.save();
 
-    // (opcional) marcar descargada
+    // opcional: marcar descargada
     await pool.query(
       `UPDATE registros_8m_5k
        SET carta_descargada = true, carta_descargada_at = now()
