@@ -18,15 +18,28 @@
       <div class="card-body p-0"></div>
     </div>
 
-    <div class="event-strip shadow-sm mb-4">
-      <div class="d-flex flex-wrap gap-2">
-        <span class="chip chip-dark"><i class="bi bi-patch-check-fill me-1"></i>Registro oficial</span>
+    <div class="event-strip shadow-sm mb-4 p-3 rounded-3" style="border-left: 4px solid #e91e63;">
+      <div class="d-flex flex-wrap align-items-start gap-3">
+        <div class="d-flex flex-column gap-1 flex-shrink-0">
+          <span class="chip chip-danger">
+            <i class="bi bi-gender-female me-1"></i>
+            Evento exclusivo para mujeres e identidades femeninas
+          </span>
+          <span class="chip chip-dark">
+            <i class="bi bi-patch-check-fill me-1"></i>
+            Registro oficial
+          </span>
+        </div>
       </div>
 
-      <a class="btn btn-hero" href="#frm">
-        <i class="bi bi-pencil-square me-2"></i>Registrar
-      </a>
+      <div class="mt-3 pt-2 border-top border-light">
+        <a class="btn btn-hero btn-danger text-white shadow-sm" href="#frm">
+          <i class="bi bi-pencil-square me-2"></i>
+          Registrar asistencia
+        </a>
+      </div>
     </div>
+
 
     <div id="alertBox" class="alert d-none shadow-sm border-0" role="alert">
       <i class="bi bi-exclamation-triangle-fill me-2"></i>
@@ -74,11 +87,44 @@
           </div>
           <div class="col-md-6">
             <label class="form-label fw-semibold">
+              <i class="bi bi-gender-ambiguous me-1 text-muted"></i>Género
+            </label>
+
+            <select class="form-select form-select-lg" name="genero" required>
+              <option value="">Selecciona</option>
+              <option value="Mujer">Mujer</option>
+              <option value="Mujer trans">Mujer trans</option>
+              <option value="No binaria (identidad femenina)">No binaria (identidad femenina)</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">
               <i class="bi bi-geo-alt-fill me-1 text-muted"></i>Municipio
             </label>
             <select class="form-select form-select-lg" name="id_municipio" id="municipioSelect" required>
               <option value="">Selecciona municipio...</option>
             </select>
+            
+            <div class="col-12">
+              <div class="form-check form-switch form-check-lg">
+                <input class="form-check-input" type="checkbox" id="chkForanea" name="es_foranea">
+                <label class="form-check-label" for="chkForanea">
+                  Soy foránea (no vivo en un municipio del Estado de México)
+                </label>
+              </div>
+            </div>
+
+            <div class="col-md-6 d-none" id="boxForaneaEstado">
+              <label class="form-label fw-semibold">Estado</label>
+              <input class="form-control form-control-lg" name="estado" id="inpEstado" placeholder="Ej. CDMX, Michoacán" disabled>
+            </div>
+
+            <div class="col-md-6 d-none" id="boxForaneaCiudad">
+              <label class="form-label fw-semibold">Ciudad / Alcaldía / Municipio</label>
+              <input class="form-control form-control-lg" name="ciudad" id="inpCiudad" placeholder="Ej. Toluca / Iztapalapa / Morelia" disabled>
+            </div>
+
           </div>
           <div class="col-md-6">
             <label class="form-label fw-semibold">
@@ -98,67 +144,24 @@
             </label>
             <input class="form-control form-control-lg" name="tipo_sangre" placeholder="O+, A-, etc.">
           </div>
-         <!-- <div class="col-md-3">
+        <hr class="my-4">
+         <div class="col-md-3">
             <label class="form-label fw-semibold">
               <i class="bi bi-tshirt me-1 text-muted"></i>Talla playera
             </label>
-            <select class="form-select form-control-lg" name="talla_playera" required>
-              <option value="">Selecciona…</option>
-              <option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option>
+            <div class="alert alert-warning">
+            Las primeras 500 corredoras registradas recibirán playera conmemorativa.
+            </div>
+            <select name="talla_playera" id="tallaSelect" class="form-select">
+              <option value="">Selecciona talla</option>
             </select>
-          </div> -->
-
-          <hr class="my-4">
-
-          <h5 class="form-section mb-4">
-            <i class="bi bi-trophy-fill me-2 text-warning"></i>II. Premiación (solo servidoras públicas)
-          </h5>
-
-          <div class="row g-3">
-            <div class="col-md-6 form-check form-switch form-check-lg">
-              <input class="form-check-input" type="checkbox" name="es_servidora_publica" id="es_servidora_publica">
-              <label class="form-check-label fs-6 fw-semibold" for="es_servidora_publica">
-                Participaré para premiación (soy servidora pública)
-              </label>
-            </div>
-
-            <div class="col-md-6 form-check form-switch form-check-lg">
-              <input class="form-check-input" type="checkbox" name="num_empleado_no_aplica" id="num_empleado_no_aplica" checked>
-              <label class="form-check-label fs-6" for="num_empleado_no_aplica">
-                No aplica (correré recreativamente)
-              </label>
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">
-                <i class="bi bi-badge-ad me-1 text-muted"></i>Número de empleado
-              </label>
-              <input class="form-control form-control-lg" name="num_empleado" id="num_empleado" disabled placeholder="Captura tu número de empleado">
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">
-                <i class="bi bi-building me-1 text-muted"></i>Dependencia / Secretaría
-              </label>
-              <input class="form-control form-control-lg" name="dependencia" id="dependencia" disabled
-                    placeholder="Ej. Secretaría General de Gobierno">
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">
-                <i class="bi bi-diagram-3 me-1 text-muted"></i>Área
-              </label>
-              <input class="form-control form-control-lg" name="area" id="area" disabled
-                    placeholder="Ej. Dirección / Departamento / Coordinación">
-            </div>
-          </div>
-        </div>
+          </div> 
 
         <hr class="my-4">
 
         <!-- Sección II: Emergencia -->
         <h5 class="form-section mb-4">
-          <i class="bi bi-exclamation-diamond-fill me-2 text-danger"></i>III. Emergencia
+          <i class="bi bi-exclamation-diamond-fill me-2 text-danger"></i>II. Emergencia
         </h5>
         <div class="row g-3">
           <div class="col-md-8">
@@ -179,7 +182,7 @@
 
         <!-- Sección III: Salud -->
         <h5 class="form-section mb-4">
-          <i class="bi bi-heart-fill me-2 text-warning"></i>IV. Salud
+          <i class="bi bi-heart-fill me-2 text-warning"></i>III. Salud
         </h5>
         <div class="row g-3">
           <div class="col-md-6 form-check form-switch form-check-lg">
@@ -222,7 +225,7 @@
 
         <!-- Sección IV: Participación -->
         <h5 class="form-section mb-4">
-          <i class="bi bi-check2-circle me-2 text-success"></i>V. Participación
+          <i class="bi bi-check2-circle me-2 text-success"></i>IV. Participación
         </h5>
         <div class="row g-3">
           <div class="col-md-4 form-check form-switch form-check-lg">
@@ -327,6 +330,9 @@
                 <strong>Guarda este folio</strong> para recoger tu kit
             </div>
         </div>
+          <a id="btnCarta" class="btn btn-light btn-lg mt-3" target="_blank" rel="noopener">
+            <i class="bi bi-file-earmark-pdf me-2"></i>Descargar carta responsiva (PDF)
+          </a>
     </div>
   </div>
 
