@@ -83,6 +83,9 @@ async function loadStatus() {
         Registradas: ${j.registrados} / ${j.cupo_max} (Disponibles: ${j.disponibles})
       </span>
     `;
+    if (j.registrados > 1000) {
+      document.getElementById("bannerKits").classList.remove("d-none");
+    }
     if (j.cerrado) {
       frm.querySelectorAll("input,select,textarea,button").forEach(el => el.disabled = true);
     }
@@ -134,6 +137,9 @@ frm.addEventListener("submit", async (e) => {
     lblFolio.textContent = data.folio;
     lblNumeroCorredora.textContent = data.numero_corredora;
     okBox.classList.remove("d-none");
+    if (data.aviso_extra) {
+      showAlert("warning", data.aviso_extra);
+    }
 
     // PDF carta (mejor después de éxito)
     const url = `/api/carta?folio=${encodeURIComponent(data.folio)}`;
