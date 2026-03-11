@@ -243,13 +243,22 @@ app.post("/api/registros", async (req, res) => {
     const ins = await client.query(q, params);
     await client.query("COMMIT");
 
-    res.json({
-      ok: true,
-      folio: ins.rows[0].folio,
-      numero_corredora: ins.rows[0].numero_corredora,
-      created_at: ins.rows[0].created_at
-    });
+      const numero = ins.rows[0].numero_corredora;
 
+      let aviso_extra = null;
+
+      if (numero > 1000) {
+        aviso_extra = "Aviso: Los kits oficiales del evento fueron asignados a las primeras 1000 corredoras registradas. Tu registro sigue siendo válido y podrás participar en la carrera.";
+      }
+
+      res.json({
+        ok: true,
+        folio: ins.rows[0].folio,
+        numero_corredora: numero,
+        created_at: ins.rows[0].created_at,
+        aviso_extra
+      });
+      
   } catch (err) {
     await client.query("ROLLBACK");
 
