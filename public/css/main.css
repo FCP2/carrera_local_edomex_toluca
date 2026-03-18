@@ -503,3 +503,55 @@ hr { opacity: .12; }
   }
 }
 
+/*banner cerrado*/
+.banner-8m {
+  background: linear-gradient(135deg, #ff4da6, #d63384);
+  color: white;
+  border-radius: 16px;
+  padding: 18px 22px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 25px rgba(214, 51, 132, 0.25);
+  animation: fadeInUp 0.5s ease;
+}
+
+.banner-8m .banner-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.banner-8m .icono {
+  font-size: 2rem;
+}
+
+.banner-8m h4 {
+  font-weight: 700;
+}
+
+.banner-8m p {
+  opacity: 0.95;
+}
+
+/* animación suave */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/*banner ultimos*/
+.banner-warning {
+  background: linear-gradient(135deg, #ffc107, #ff9800);
+  color: #222;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 15px;
+  font-weight: 500;
+  box-shadow: 0 6px 18px rgba(255, 152, 0, 0.25);
+}
+
