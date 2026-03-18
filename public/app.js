@@ -75,6 +75,7 @@ async function loadStatus() {
     const r = await fetch("/api/status");
     const j = await r.json();
     if (!j.ok) return;
+
     statusEl.innerHTML = `
       <span class="badge text-bg-${j.cerrado ? "danger" : "success"}">
         ${j.cerrado ? "Registro cerrado" : "Registro abierto"}
@@ -83,15 +84,32 @@ async function loadStatus() {
         Registradas: ${j.registrados} / ${j.cupo_max} (Disponibles: ${j.disponibles})
       </span>
     `;
-    if (j.registrados > 1000) {
-      document.getElementById("bannerKits").classList.remove("d-none");
-    }
-    if (j.cerrado) {
-      frm.querySelectorAll("input,select,textarea,button").forEach(el => el.disabled = true);
-    }
-  } catch {}
-}
 
+    const bannerCerrado = document.getElementById("bannerCerrado");
+    const bannerUltimos = document.getElementById("bannerUltimos");
+
+    if (j.cerrado) {
+      bannerCerrado?.classList.remove("d-none");
+      bannerUltimos?.classList.add("d-none");
+
+      frm.querySelectorAll("input,select,textarea,button").forEach(el => {
+        el.disabled = true;
+      });
+    } else {
+      bannerCerrado?.classList.add("d-none");
+
+      // ejemplo: mostrar "últimos lugares" cuando queden 50 o menos
+      if (j.disponibles <= 50) {
+        bannerUltimos?.classList.remove("d-none");
+        bannerUltimos.innerHTML = `<strong>Últimos lugares disponibles:</strong> quedan ${j.disponibles}.`;
+      } else {
+        bannerUltimos?.classList.add("d-none");
+      }
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
 function formToPayload(form) {
   const fd = new FormData(form);
   const payload = Object.fromEntries(fd.entries());
@@ -180,22 +198,6 @@ async function loadMunicipios() {
 }
 //cargar tipo de playeras:
 
-async function loadTallas() {
-  const r = await fetch("/api/playeras");
-  const data = await r.json();
-
-  const sel = document.getElementById("tallaSelect");
-
-  data.tallas.forEach(t => {
-    const opt = document.createElement("option");
-    opt.value = t.talla;
-    opt.textContent = `${t.talla} (${t.stock_disponible} disponibles)`;
-    sel.appendChild(opt);
-  });
-}
-
-document.addEventListener("DOMContentLoaded", loadTallas);
-
 
 // Llamar al cargar DOM
 document.addEventListener('DOMContentLoaded', loadMunicipios);
@@ -281,5 +283,10 @@ function syncMenorUI(){
 chkMenor?.addEventListener("change", syncMenorUI);
 syncMenorUI();
 
-loadStatus();
-saludOn();
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadMunicipios();
+  await loadStatus();
+  saludOn();
+  syncForaneaUI();
+  syncMenorUI();
+});
