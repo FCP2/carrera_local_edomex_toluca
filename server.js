@@ -7,7 +7,7 @@ const app = express();
 app.use(express.json({ limit: "1mb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
-const CUPO_MAX = Number(process.env.CUPO_MAX || 1500);
+const CUPO_MAX = Number(process.env.CUPO_MAX || 1300);
 const FOLIO_PREFIX = process.env.FOLIO_PREFIX || "8M-2026-";
 
 
