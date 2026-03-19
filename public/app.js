@@ -80,9 +80,6 @@ async function loadStatus() {
       <span class="badge text-bg-${j.cerrado ? "danger" : "success"}">
         ${j.cerrado ? "Registro cerrado" : "Registro abierto"}
       </span>
-      <span class="ms-2 text-muted">
-        Registradas: ${j.registrados} / ${j.cupo_max} (Disponibles: ${j.disponibles})
-      </span>
     `;
 
     const bannerCerrado = document.getElementById("bannerCerrado");
