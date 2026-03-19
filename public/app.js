@@ -87,29 +87,36 @@ async function loadStatus() {
 
     const bannerCerrado = document.getElementById("bannerCerrado");
     const bannerUltimos = document.getElementById("bannerUltimos");
+    const infoKit = document.getElementById("infoKitContainer");
 
     if (j.cerrado) {
       bannerCerrado?.classList.remove("d-none");
       bannerUltimos?.classList.add("d-none");
-
+      
+      // ✅ MUESTRA INFOGRAFÍA solo cuando está CERRADO
+      infoKit?.classList.remove("d-none");
+      
       frm.querySelectorAll("input,select,textarea,button").forEach(el => {
         el.disabled = true;
       });
     } else {
       bannerCerrado?.classList.add("d-none");
-
-      // ejemplo: mostrar "últimos lugares" cuando queden 50 o menos
+      
       if (j.disponibles <= 50) {
         bannerUltimos?.classList.remove("d-none");
         bannerUltimos.innerHTML = `<strong>Últimos lugares disponibles:</strong> quedan ${j.disponibles}.`;
       } else {
         bannerUltimos?.classList.add("d-none");
       }
+      
+      // ✅ OCULTA INFOGRAFÍA cuando está ABIERTO
+      infoKit?.classList.add("d-none");
     }
   } catch (e) {
     console.error(e);
   }
 }
+
 function formToPayload(form) {
   const fd = new FormData(form);
   const payload = Object.fromEntries(fd.entries());
